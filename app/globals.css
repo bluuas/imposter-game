@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+:root {
+  --foreground: #1e293b;
+  --accent: #2563eb;
+  --accent-dark: #1d4ed8;
+  --page-bg: #f1f5f9;
+  --card: #ffffff;
+  --card-2: #e2e8f0;
+  --text-muted: #64748b;
+}
+
+@theme inline {
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--page-bg);
+  color: var(--foreground);
+}
+
+button, a {
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+/* ─── Fish easter egg ─────────────────────────────────── */
+html[data-fish="true"] body {
+  background: linear-gradient(-45deg, #bae6fd, #e0f2fe, #cffafe, #a5f3fc, #bae6fd);
+  background-size: 300% 300%;
+  animation: ocean-bg 8s ease infinite;
+}
+
+@keyframes ocean-bg {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Fish swimming left → right */
+.fish-swimmer {
+  position: fixed;
+  pointer-events: none;
+  z-index: 50;
+  left: -3em;
+  animation-name: fish-swim;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  opacity: 0;
+  user-select: none;
+}
+
+@keyframes fish-swim {
+  0%   { opacity: 0;   transform: scaleX(-1) translateX(0);       }
+  7%   { opacity: 0.9; transform: scaleX(-1) translateX(0);       }
+  93%  { opacity: 0.8; transform: scaleX(-1) translateX(-115vw);   }
+  100% { opacity: 0;   transform: scaleX(-1) translateX(-115vw);   }
+}
+
+/* Boats bobbing at the waterline */
+.fish-boat {
+  position: fixed;
+  pointer-events: none;
+  z-index: 50;
+  animation-name: boat-bob;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  user-select: none;
+}
+
+@keyframes boat-bob {
+  0%, 100% { transform: translateY(0px)   rotate(-1.5deg); }
+  50%       { transform: translateY(-9px)  rotate(1.5deg);  }
+}

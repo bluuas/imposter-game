@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: imposter-game
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: REDIS_URL
+        fromService:
+          name: imposter-game-redis
+          type: redis
+          property: connectionString
+
+  - type: redis
+    name: imposter-game-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
