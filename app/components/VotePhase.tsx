@@ -1,6 +1,7 @@
 "use client";
 
 import { Player } from "@/lib/types";
+import { useLanguage } from "./LanguageProvider";
 
 type Props = {
   players: Player[];
@@ -11,12 +12,13 @@ type Props = {
 
 export default function VotePhase({ players, votes, onVote, onReveal }: Props) {
   const totalVotes = Object.values(votes).reduce((a, b) => a + b, 0);
+  const { t } = useLanguage();
 
   return (
     <div className="flex flex-col flex-1 min-h-dvh p-6 max-w-md mx-auto w-full">
-      <h1 className="text-2xl font-bold text-center pt-4 mb-2">Vote</h1>
+      <h1 className="text-2xl font-bold text-center pt-4 mb-2">{t.vote}</h1>
       <p className="text-[var(--text-muted)] text-sm text-center mb-6">
-        Who is the imposter? Tap a player to vote for them.
+        {t.voteHint}
       </p>
 
       <div className="flex flex-col gap-3 flex-1">
@@ -37,13 +39,13 @@ export default function VotePhase({ players, votes, onVote, onReveal }: Props) {
 
       <div className="mt-6 pb-8">
         <p className="text-[var(--text-muted)] text-xs text-center mb-4">
-          {totalVotes} vote{totalVotes !== 1 ? "s" : ""} cast
+          {t.votesCast(totalVotes)}
         </p>
         <button
           onClick={onReveal}
           className="w-full bg-red-700 active:bg-red-800 text-[var(--card)] text-lg font-bold py-5 rounded-2xl"
         >
-          Reveal the imposter →
+          {t.revealImposter}
         </button>
       </div>
     </div>

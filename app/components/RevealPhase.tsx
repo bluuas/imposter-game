@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { LocalGameData } from "@/lib/types";
 import { getEmojiColor } from "@/lib/themes";
+import { useLanguage } from "./LanguageProvider";
 
 const HOLD_DURATION = 1500; // ms
 
@@ -60,6 +61,7 @@ export default function RevealPhase({ gameData, onNext, onDone }: Props) {
   const circumference = 2 * Math.PI * 44;
   const total = revealOrder.length;
   const emojiColor = getEmojiColor(currentPlayer.emoji);
+  const { t } = useLanguage();
 
   return (
     <div className="flex flex-col flex-1 min-h-dvh items-center justify-between p-6">
@@ -90,7 +92,7 @@ export default function RevealPhase({ gameData, onNext, onDone }: Props) {
         <span className="text-7xl">{currentPlayer.emoji}</span>
         <h2 className="text-2xl font-bold" style={{ color: emojiColor.text }}>{currentPlayer.name}</h2>
         <p className="text-sm" style={{ color: emojiColor.border }}>
-          Make sure no one else can see your screen
+          {t.makePrivate}
         </p>
       </div>
 
@@ -132,11 +134,11 @@ export default function RevealPhase({ gameData, onNext, onDone }: Props) {
               aria-label="Hold to reveal your word"
             >
               <span className="text-3xl">👁️</span>
-              <span className="text-xs mt-1 text-[var(--text-muted)]">Hold to reveal</span>
+              <span className="text-xs mt-1 text-[var(--text-muted)]">{t.holdToReveal}</span>
             </button>
           </div>
           <p className="text-[var(--text-muted)] text-xs">
-            Player {currentRevealIndex + 1} of {total}
+            {t.playerXofY(currentRevealIndex + 1, total)}
           </p>
         </div>
       ) : (
@@ -151,19 +153,19 @@ export default function RevealPhase({ gameData, onNext, onDone }: Props) {
             {isImposter ? (
               <>
                 <p className="text-5xl mb-3">🕵️</p>
-                <p className="text-3xl font-bold text-red-300">IMPOSTER</p>
+                <p className="text-3xl font-bold text-red-300">{t.imposter}</p>
                 <p className="text-red-300 text-sm mt-2">
-                  Try to blend in — don&apos;t reveal yourself!
+                  {t.imposterHint}
                 </p>
               </>
             ) : (
               <>
                 <p className="text-emerald-300 text-sm mb-2">
-                  The secret word is
+                  {t.secretWordIs}
                 </p>
                 <p className="text-3xl font-bold text-emerald-300">{word}</p>
                 <p className="text-emerald-300 text-sm mt-2">
-                  Don&apos;t let the imposter figure it out!
+                  {t.wordHint}
                 </p>
               </>
             )}
@@ -173,10 +175,10 @@ export default function RevealPhase({ gameData, onNext, onDone }: Props) {
             className="w-full text-[var(--card)] text-lg font-bold py-5 rounded-2xl"
             style={{ backgroundColor: 'var(--accent)' }}
           >
-            {isLast ? "Start Discussion →" : "Pass to next player →"}
+            {isLast ? t.startDiscussion : t.passToNext}
           </button>
           <p className="text-[var(--text-muted)] text-xs">
-            Player {currentRevealIndex + 1} of {total}
+            {t.playerXofY(currentRevealIndex + 1, total)}
           </p>
         </div>
       )}

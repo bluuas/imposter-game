@@ -7,6 +7,7 @@ import SetupPhase from "./components/SetupPhase";
 import RevealPhase from "./components/RevealPhase";
 import VotePhase from "./components/VotePhase";
 import ResultPhase from "./components/ResultPhase";
+import { useLanguage } from "./components/LanguageProvider";
 
 type Phase = "setup" | "reveal" | "vote" | "result";
 
@@ -21,10 +22,11 @@ export default function Home() {
   const [phase, setPhase] = useState<Phase>("setup");
   const [setupData, setSetupData] = useState<SetupData>(DEFAULT_SETUP);
   const [gameData, setGameData] = useState<LocalGameData | null>(null);
+  const { locale } = useLanguage();
 
   function handleStart(data: SetupData) {
     setSetupData(data);
-    setGameData(startGame(data));
+    setGameData(startGame(data, locale));
     setPhase("reveal");
   }
 

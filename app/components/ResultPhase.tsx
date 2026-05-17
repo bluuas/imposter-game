@@ -1,6 +1,7 @@
 "use client";
 
 import { Player, LocalGameData } from "@/lib/types";
+import { useLanguage } from "./LanguageProvider";
 
 type Props = {
   players: Player[];
@@ -19,6 +20,7 @@ export default function ResultPhase({ players, gameData, onPlayAgain }: Props) {
 
   const imposterCaught = mostVotedId === imposterId;
   const maxVotes = Math.max(1, ...Object.values(votes));
+  const { t } = useLanguage();
 
   const sortedPlayers = [...players].sort(
     (a, b) => (votes[b.id] ?? 0) - (votes[a.id] ?? 0)
@@ -26,7 +28,7 @@ export default function ResultPhase({ players, gameData, onPlayAgain }: Props) {
 
   return (
     <div className="flex flex-col min-h-dvh p-6 max-w-md mx-auto w-full items-center">
-      <h1 className="text-2xl font-bold text-center pt-6 mb-6">Results</h1>
+      <h1 className="text-2xl font-bold text-center pt-6 mb-6">{t.results}</h1>
 
       {/* Outcome */}
       <div
@@ -38,18 +40,16 @@ export default function ResultPhase({ players, gameData, onPlayAgain }: Props) {
       >
         <p className="text-5xl mb-2">{imposterCaught ? "🎉" : "😈"}</p>
         <p className="text-2xl font-bold">
-          {imposterCaught ? "Imposter caught!" : "Imposter wins!"}
+          {imposterCaught ? t.imposterCaught : t.imposterWins}
         </p>
         <p className="text-slate-300 mt-1 text-sm">
-          {imposterCaught
-            ? "The group worked it out."
-            : "They blended in perfectly."}
+          {imposterCaught ? t.groupWorkedItOut : t.blendedIn}
         </p>
       </div>
 
       {/* Secret word */}
       <div className="w-full rounded-2xl p-4 text-center mb-4 bg-[var(--card)]">
-        <p className="text-[var(--text-muted)] text-sm">The secret word was</p>
+        <p className="text-[var(--text-muted)] text-sm">{t.secretWordWas}</p>
         <p className="text-2xl font-bold mt-1">{word}</p>
       </div>
 
@@ -57,7 +57,7 @@ export default function ResultPhase({ players, gameData, onPlayAgain }: Props) {
       <div className="w-full rounded-2xl p-4 flex items-center gap-4 mb-6 bg-[var(--card)]">
         <span className="text-4xl">{imposter.emoji}</span>
         <div>
-          <p className="text-[var(--text-muted)] text-xs">The imposter was</p>
+          <p className="text-[var(--text-muted)] text-xs">{t.theImposterWas}</p>
           <p className="text-xl font-bold">{imposter.name}</p>
         </div>
         <span className="ml-auto text-red-400 font-bold text-sm">🕵️ IMPOSTER</span>
@@ -65,7 +65,7 @@ export default function ResultPhase({ players, gameData, onPlayAgain }: Props) {
 
       {/* Vote breakdown */}
       <div className="w-full flex flex-col gap-2 mb-8">
-        <p className="text-[var(--text-muted)] text-sm font-medium mb-1">Votes</p>
+        <p className="text-[var(--text-muted)] text-sm font-medium mb-1">{t.votes}</p>
         {sortedPlayers.map((p) => (
           <div key={p.id} className="flex items-center gap-3">
             <span className="text-xl">{p.emoji}</span>
@@ -97,7 +97,7 @@ export default function ResultPhase({ players, gameData, onPlayAgain }: Props) {
         className="w-full text-[var(--card)] text-lg font-bold py-5 rounded-2xl"
         style={{ backgroundColor: 'var(--accent)' }}
       >
-        Play again
+        {t.playAgain}
       </button>
     </div>
   );
