@@ -7,16 +7,17 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import { Theme, THEMES, DEFAULT_THEME } from "@/lib/themes";
+import { DEFAULT_THEME, LOCALE_THEMES } from "@/lib/themes";
+import { useLanguage } from "./LanguageProvider";
 
 type ThemeContextType = {
-  theme: Theme;
-  setTheme: (t: Theme) => void;
+  funMode: boolean;
+  toggleFunMode: () => void;
 };
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: DEFAULT_THEME,
-  setTheme: () => {},
+  funMode: false,
+  toggleFunMode: () => {},
 });
 
 export function useTheme() {
@@ -24,36 +25,38 @@ export function useTheme() {
 }
 
 export default function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(DEFAULT_THEME);
+  const [funMode, setFunMode] = useState(false);
+  const { locale } = useLanguage();
+
+  // Reset fun mode whenever the locale changes
+  useEffect(() => {
+    setFunMode(false);
+  }, [locale]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("imposter-theme");
-    if (saved) {
-      const found = THEMES.find((t) => t.emoji === saved);
-      if (found) setThemeState(found);
-    }
-  }, []);
+    document.documentElement.dataset.fish = funMode && locale === "en" ? "true" : "";
+    document.documentElement.dataset.locale = funMode && locale !== "en" ? locale : "";
+  }, [funMode, locale]);
 
-  useEffect(() => {
-    document.documentElement.dataset.fish = theme.fish ? "true" : "";
-  }, [theme]);
-
-  function setTheme(t: Theme) {
-    setThemeState(t);
-    localStorage.setItem("imposter-theme", t.emoji);
+  function toggleFunMode() {
+    setFunMode((v) => !v);
   }
 
+  const base = DEFAULT_THEME;
+  const localeOverride = funMode ? LOCALE_THEMES[locale] : undefined;
+  const colors = localeOverride ? { ...base, ...localeOverride } : base;
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={{ funMode, toggleFunMode }}>
       <style>{`
         :root {
-          --accent: ${theme.accent};
-          --accent-dark: ${theme.accentDark};
-          --page-bg: ${theme.pageBg};
-          --foreground: ${theme.foreground};
-          --card: ${theme.card};
-          --card-2: ${theme.card2};
-          --text-muted: ${theme.textMuted};
+          --accent: ${colors.accent};
+          --accent-dark: ${colors.accentDark};
+          --page-bg: ${colors.pageBg};
+          --foreground: ${colors.foreground};
+          --card: ${colors.card};
+          --card-2: ${colors.card2};
+          --text-muted: ${colors.textMuted};
         }
       `}</style>
       {children}

@@ -1,3 +1,5 @@
+import type { Locale } from "@/lib/i18n";
+
 export type Theme = {
   emoji: string;
   name: string;
@@ -40,6 +42,56 @@ export const THEMES: Theme[] = [
 ];
 
 export const DEFAULT_THEME = THEMES[0];
+
+export type LocaleTheme = {
+  accent: string;
+  accentDark: string;
+  pageBg: string;
+  foreground: string;
+  card: string;
+  card2: string;
+  textMuted: string;
+};
+
+// Per-locale colour palettes — applied when fun mode is active
+export const LOCALE_THEMES: Partial<Record<Locale, LocaleTheme>> = {
+  // 🎣 EN — Fishing: ocean blues
+  en: {
+    accent: "#0284c7", accentDark: "#075985",
+    pageBg: "transparent",
+    foreground: "#0c4a6e", card: "#f0f9ff", card2: "#bae6fd", textMuted: "#0369a1",
+  },
+  // 🍺 DE — Oktoberfest: warm amber / wheat
+  de: {
+    accent: "#d97706", accentDark: "#b45309",
+    pageBg: "transparent",
+    foreground: "#422006", card: "#fffbeb", card2: "#fef3c7", textMuted: "#78350f",
+  },
+  // 🍕 IT — La Dolce Vita: terracotta sunset
+  it: {
+    accent: "#dc2626", accentDark: "#b91c1c",
+    pageBg: "transparent",
+    foreground: "#431407", card: "#fff7ed", card2: "#fee2e2", textMuted: "#9a3412",
+  },
+  // 🥖 FR — Magnifique: lavender-blue dusk
+  fr: {
+    accent: "#7c3aed", accentDark: "#6d28d9",
+    pageBg: "transparent",
+    foreground: "#1e1b4b", card: "#f5f3ff", card2: "#ede9fe", textMuted: "#5b21b6",
+  },
+  // 🐂 ES — Fiesta: Spanish gold + red
+  es: {
+    accent: "#dc2626", accentDark: "#b91c1c",
+    pageBg: "transparent",
+    foreground: "#450a0a", card: "#fffbeb", card2: "#fef9c3", textMuted: "#7f1d1d",
+  },
+  // 🫎 SV — Norrsken: pastel northern lights
+  sv: {
+    accent: "#16a34a", accentDark: "#15803d",
+    pageBg: "transparent",
+    foreground: "#052e16", card: "#f0fdf4", card2: "#dcfce7", textMuted: "#166534",
+  },
+};
 
 export type EmojiColor = { bg: string; border: string; text: string };
 

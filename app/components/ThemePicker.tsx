@@ -1,26 +1,32 @@
 "use client";
 
-import { THEMES } from "@/lib/themes";
+import type { Locale } from "@/lib/i18n";
 import { useTheme } from "./ThemeProvider";
+import { useLanguage } from "./LanguageProvider";
 
-const BLUEBERRY = THEMES[0];
-const FISH       = THEMES[1];
+const LOCALE_EMOJI: Record<Locale, string> = {
+  en: "🎣",
+  de: "🍺",
+  it: "🍕",
+  fr: "🥖",
+  es: "💃",
+  sv: "🫎",
+};
 
 export default function ThemePicker() {
-  const { theme, setTheme } = useTheme();
-  const isFish = theme.fish ?? false;
+  const { funMode, toggleFunMode } = useTheme();
+  const { locale } = useLanguage();
+  const emoji = LOCALE_EMOJI[locale];
+  const label = funMode ? "Disable fun mode" : "Enable fun mode";
 
   return (
     <button
-      onPointerDown={(e) => {
-        e.preventDefault();
-        setTheme(isFish ? BLUEBERRY : FISH);
-      }}
-      className="text-xl p-2 rounded-xl bg-[var(--card)] active:opacity-70"
-      aria-label={isFish ? "Disable fishing mode" : "Enable fishing mode"}
-      title={isFish ? "Disable fishing mode" : "Enable fishing mode"}
+      onPointerDown={(e) => { e.preventDefault(); toggleFunMode(); }}
+      className={`text-xl p-2 rounded-xl bg-[var(--card)] active:opacity-70 transition-opacity ${funMode ? "opacity-100 ring-2 ring-[var(--accent)]" : "opacity-60"}`}
+      aria-label={label}
+      title={label}
     >
-      🎣
+      {emoji}
     </button>
   );
 }

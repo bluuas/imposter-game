@@ -74,3 +74,109 @@ html[data-fish="true"] body {
   0%, 100% { transform: translateY(0px)   rotate(-1.5deg); }
   50%       { transform: translateY(-9px)  rotate(1.5deg);  }
 }
+
+/* ─── Locale easter eggs ──────────────────────────────── */
+
+/* DE — Oktoberfest: warm amber / wheat */
+html[data-locale="de"] body {
+  background: linear-gradient(-45deg, #fef3c7, #fde68a, #fbbf24, #fed7aa, #fef3c7);
+  background-size: 300% 300%;
+  animation: oktoberfest-bg 10s ease infinite;
+}
+@keyframes oktoberfest-bg {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+/* IT — La Dolce Vita: terracotta sunset */
+html[data-locale="it"] body {
+  background: linear-gradient(-45deg, #fff7ed, #fed7aa, #fb923c, #ef4444, #fff7ed);
+  background-size: 300% 300%;
+  animation: dolcevita-bg 10s ease infinite;
+}
+@keyframes dolcevita-bg {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+/* FR — Magnifique: lavender-blue dusk */
+html[data-locale="fr"] body {
+  background: linear-gradient(-45deg, #ede9fe, #ddd6fe, #bfdbfe, #e0e7ff, #ede9fe);
+  background-size: 300% 300%;
+  animation: magnifique-bg 12s ease infinite;
+}
+@keyframes magnifique-bg {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+/* ES — Fiesta: Spanish gold + red */
+html[data-locale="es"] body {
+  background: linear-gradient(-45deg, #fef9c3, #fde047, #facc15, #dc2626, #fef9c3);
+  background-size: 300% 300%;
+  animation: fiesta-bg 8s ease infinite;
+}
+@keyframes fiesta-bg {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+/* SV — Norrsken: pastel northern lights */
+html[data-locale="sv"] body {
+  background: linear-gradient(-45deg, #d1fae5, #a7f3d0, #99f6e4, #bfdbfe, #d1fae5);
+  background-size: 300% 300%;
+  animation: norrsken-bg 14s ease infinite;
+}
+@keyframes norrsken-bg {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+/* Shared locale element classes */
+.locale-swimmer {
+  position: fixed;
+  pointer-events: none;
+  z-index: 50;
+  left: -3em;
+  animation-name: locale-swim;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  opacity: 0;
+  user-select: none;
+}
+
+@keyframes locale-swim {
+  0%   { opacity: 0;   transform: translateX(0);      }
+  7%   { opacity: 0.9; transform: translateX(0);      }
+  93%  { opacity: 0.8; transform: translateX(115vw);  }
+  100% { opacity: 0;   transform: translateX(115vw);  }
+}
+
+.locale-bobber {
+  position: fixed;
+  pointer-events: none;
+  z-index: 50;
+  animation-name: boat-bob;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  user-select: none;
+}
+
+.snow-faller {
+  position: fixed;
+  pointer-events: none;
+  z-index: 50;
+  top: -2em;
+  animation-name: snow-fall;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  opacity: 0;
+  user-select: none;
+}
+
+@keyframes snow-fall {
+  0%   { opacity: 0;   transform: translateY(0)       rotate(0deg);   }
+  8%   { opacity: 0.85;                                                }
+  92%  { opacity: 0.7;                                                 }
+  100% { opacity: 0;   transform: translateY(110vh)   rotate(360deg); }
+}
