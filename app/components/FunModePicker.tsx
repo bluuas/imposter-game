@@ -13,7 +13,7 @@ const LOCALE_EMOJI: Record<Locale, string> = {
   sv: "🫎",
 };
 
-export default function ThemePicker() {
+export default function FunModePicker() {
   const { funMode, toggleFunMode } = useTheme();
   const { locale } = useLanguage();
   const emoji = LOCALE_EMOJI[locale];

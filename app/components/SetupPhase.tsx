@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Player, SetupData } from "@/lib/types";
 import { getWordCategories } from "@/data/words";
-import ThemePicker from "./ThemePicker";
+import FunModePicker from "./FunModePicker";
 import LanguagePicker from "./LanguagePicker";
 import { useLanguage } from "./LanguageProvider";
 
@@ -79,7 +79,7 @@ export default function SetupPhase({ initialData, onStart }: Props) {
         <h1 className="text-3xl font-bold">{t.appName}</h1>
         <div className="flex gap-2">
           <LanguagePicker />
-          <ThemePicker />
+          <FunModePicker />
         </div>
       </div>
 

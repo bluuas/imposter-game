@@ -256,7 +256,7 @@ function NorrskenParade() {
 
 /* ─── Root component ─────────────────────────────────────────────────────── */
 
-export default function UnicornSparkles() {
+export default function FunModeParade() {
   const { funMode } = useTheme();
   const { locale } = useLanguage();
 
