@@ -6,6 +6,7 @@ import { getWordCategories } from "@/data/words";
 import FunModePicker from "./FunModePicker";
 import LanguagePicker from "./LanguagePicker";
 import { useLanguage } from "./LanguageProvider";
+import { useRouter } from "next/navigation";
 
 const EMOJIS = [
   "😀", "😎", "🤩", "🥳", "😈", "👻", "🤠", "🤓",
@@ -16,9 +17,10 @@ const EMOJIS = [
 type Props = {
   initialData: SetupData;
   onStart: (data: SetupData) => void;
+  onCreateRoom?: (data: SetupData) => void;
 };
 
-export default function SetupPhase({ initialData, onStart }: Props) {
+export default function SetupPhase({ initialData, onStart, onCreateRoom }: Props) {
   const { locale, t } = useLanguage();
   const wordCategories = getWordCategories(locale);
   const [players, setPlayers] = useState<Player[]>(initialData.players);
@@ -265,8 +267,8 @@ export default function SetupPhase({ initialData, onStart }: Props) {
         )}
       </section>
 
-      {/* Start button */}
-      <div className="mt-auto pb-8">
+      {/* Start buttons */}
+      <div className="mt-auto pb-8 flex flex-col gap-3">
         <button
           onClick={() =>
             onStart({ players, wordSource, category, customWords })
@@ -277,6 +279,16 @@ export default function SetupPhase({ initialData, onStart }: Props) {
         >
           {t.startGame}
         </button>
+        {onCreateRoom && (
+          <button
+            onClick={() =>
+              onCreateRoom({ players: [], wordSource, category, customWords })
+            }
+            className="w-full bg-[var(--card)] text-[var(--foreground)] text-base font-semibold py-4 rounded-2xl border border-[var(--card-2)]"
+          >
+            {t.createOnlineRoom ?? "🌐 Create Online Room"}
+          </button>
+        )}
       </div>
     </div>
   );
