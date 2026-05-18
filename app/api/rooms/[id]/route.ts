@@ -54,7 +54,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         room.word = getRandomWord(room.category, locale);
         const imposterIndex = Math.floor(Math.random() * room.players.length);
         room.imposterId = room.players[imposterIndex].id;
+        // Reset per-round transient state so a new round starts cleanly
         room.phase = "reveal";
+        room.votes = {};
         room.players = room.players.map((p) => ({ ...p, ready: false }));
         return room;
       }
