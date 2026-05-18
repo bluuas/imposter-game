@@ -23,7 +23,7 @@ export default function Home() {
   const [phase, setPhase] = useState<Phase>("setup");
   const [setupData, setSetupData] = useState<SetupData>(DEFAULT_SETUP);
   const [gameData, setGameData] = useState<LocalGameData | null>(null);
-  const { locale } = useLanguage();
+  const { locale, t } = useLanguage();
   const router = useRouter();
 
   async function handleCreateRoom(data: SetupData, host?: { name?: string; emoji?: string }) {
@@ -44,7 +44,25 @@ export default function Home() {
         category: data.category !== "all" ? data.category : undefined,
       }),
     });
+    if (!res.ok) {
+      let err = null;
+      try {
+        err = await res.json();
+      } catch (_) {
+        // ignore
+      }
+      console.error("Create room failed:", err ?? res.statusText);
+      alert(err?.error ?? `Failed to create room: ${res.status} ${res.statusText}`);
+      return;
+    }
+
     const { room } = await res.json();
+    if (!room || !room.id) {
+      console.error("Create room returned invalid payload:", room);
+      alert("Failed to create room: invalid response from server");
+      return;
+    }
+
     router.push(`/room/${room.id}`);
   }
 
