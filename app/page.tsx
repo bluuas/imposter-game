@@ -48,6 +48,10 @@ export default function Home() {
     router.push(`/room/${room.id}`);
   }
 
+  function handleJoinRoom(code: string) {
+    router.push(`/room/${code.toUpperCase()}`);
+  }
+
   function handleStart(data: SetupData) {
     setSetupData(data);
     setGameData(startGame(data, locale));
@@ -82,7 +86,7 @@ export default function Home() {
   return (
     <main className="min-h-dvh flex flex-col" style={{ backgroundColor: 'var(--page-bg)', color: 'var(--foreground)' }}>
       {phase === "setup" && (
-        <SetupPhase initialData={setupData} onStart={handleStart} onCreateRoom={handleCreateRoom} />
+        <SetupPhase initialData={setupData} onStart={handleStart} onCreateRoom={handleCreateRoom} onJoinRoom={handleJoinRoom} />
       )}
       {phase === "reveal" && gameData && (
         <RevealPhase

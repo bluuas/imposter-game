@@ -46,7 +46,7 @@ export async function updateRoom(
 
 function generateCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no ambiguous O/0/1/I
-  return Array.from({ length: 6 }, () =>
+  return Array.from({ length: 3 }, () =>
     chars[Math.floor(Math.random() * chars.length)]
   ).join("");
 }

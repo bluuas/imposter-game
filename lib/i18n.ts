@@ -54,6 +54,7 @@ export type Translations = {
   playAgain: string;
   // Multiplayer / room
   createOnlineRoom: string;
+  createRoom: string;
   roomCode: string;
   shareCode: string;
   waitingForHost: string;
@@ -111,7 +112,8 @@ const en: Translations = {
   theImposterWas: "The imposter was",
   votes: "Votes",
   playAgain: "Play again",
-  createOnlineRoom: "🌐 Create Online Room",
+  createOnlineRoom: "🌐 Multiplayer",
+  createRoom: "Create Room",
   roomCode: "Room Code",
   shareCode: "Share this code with other players",
   waitingForHost: "Waiting for host to start…",
@@ -169,7 +171,8 @@ const de: Translations = {
   theImposterWas: "Der Imposter war",
   votes: "Stimmen",
   playAgain: "Nochmal spielen",
-  createOnlineRoom: "🌐 Online-Raum erstellen",
+  createOnlineRoom: "🌐 Mehrspieler",
+  createRoom: "Raum erstellen",
   roomCode: "Raumcode",
   shareCode: "Teile diesen Code mit den anderen Spielern",
   waitingForHost: "Warten auf Spielleiter…",
@@ -227,7 +230,8 @@ const it: Translations = {
   theImposterWas: "L'impostore era",
   votes: "Voti",
   playAgain: "Gioca ancora",
-  createOnlineRoom: "🌐 Crea stanza online",
+  createOnlineRoom: "🌐 Multigiocatore",
+  createRoom: "Crea stanza",
   roomCode: "Codice stanza",
   shareCode: "Condividi questo codice con gli altri giocatori",
   waitingForHost: "In attesa dell'host…",
@@ -285,7 +289,8 @@ const fr: Translations = {
   theImposterWas: "L'imposteur était",
   votes: "Votes",
   playAgain: "Rejouer",
-  createOnlineRoom: "🌐 Créer une salle en ligne",
+  createOnlineRoom: "🌐 Multijoueur",
+  createRoom: "Créer une salle",
   roomCode: "Code de la salle",
   shareCode: "Partage ce code avec les autres joueurs",
   waitingForHost: "En attente de l'hôte…",
@@ -343,7 +348,8 @@ const es: Translations = {
   theImposterWas: "El impostor era",
   votes: "Votos",
   playAgain: "Jugar de nuevo",
-  createOnlineRoom: "🌐 Crear sala online",
+  createOnlineRoom: "🌐 Multijugador",
+  createRoom: "Crear sala",
   roomCode: "Código de sala",
   shareCode: "Comparte este código con los demás jugadores",
   waitingForHost: "Esperando al anfitrión…",
@@ -401,7 +407,8 @@ const sv: Translations = {
   theImposterWas: "Bedragaren var",
   votes: "Röster",
   playAgain: "Spela igen",
-  createOnlineRoom: "🌐 Skapa onlinerum",
+  createOnlineRoom: "🌐 Flerspelare",
+  createRoom: "Skapa rum",
   roomCode: "Rumskod",
   shareCode: "Dela den här koden med de andra spelarna",
   waitingForHost: "Väntar på värden…",

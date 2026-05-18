@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Player, SetupData } from "@/lib/types";
+import type { Translations } from "@/lib/i18n";
 import { getWordCategories } from "@/data/words";
 import FunModePicker from "./FunModePicker";
 import LanguagePicker from "./LanguagePicker";
@@ -14,13 +15,101 @@ const EMOJIS = [
   "🔥", "⚡", "🎯", "🎮", "🚀", "💎", "🦄", "🎭",
 ];
 
+function MultiplayerPicker({
+  label,
+  onCreate,
+  onJoin,
+  t,
+}: {
+  label: string;
+  onCreate: () => void;
+  onJoin: (code: string) => void;
+  t: Translations;
+}) {
+  const [open, setOpen] = useState(false);
+  const [joining, setJoining] = useState(false);
+  const [code, setCode] = useState("");
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="w-full bg-[var(--card)] text-[var(--foreground)] text-base font-semibold py-4 rounded-2xl border border-[var(--card-2)]"
+      >
+        {label}
+      </button>
+    );
+  }
+
+  if (joining) {
+    return (
+      <div className="w-full bg-[var(--card)] rounded-2xl p-4 flex flex-col gap-3 border border-[var(--card-2)]">
+        <p className="text-sm font-semibold text-center">{t.joinRoom}</p>
+        <input
+          autoFocus
+          value={code}
+          onChange={(e) => setCode(e.target.value.toUpperCase().replace(/[^A-Z2-9]/g, "").slice(0, 3))}
+          onKeyDown={(e) => e.key === "Enter" && code.length === 3 && onJoin(code)}
+          placeholder="ABC"
+          className="w-full text-center text-2xl font-black tracking-widest px-4 py-3 rounded-xl bg-[var(--card-2)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] outline-none focus:ring-2 focus:ring-[var(--accent)] uppercase"
+          maxLength={3}
+        />
+        <div className="flex gap-2">
+          <button
+            onClick={() => { setJoining(false); setCode(""); }}
+            className="flex-1 py-3 rounded-xl bg-[var(--card-2)] text-[var(--text-muted)] text-sm font-medium"
+          >
+            {t.cancel}
+          </button>
+          <button
+            onClick={() => onJoin(code)}
+            disabled={code.length !== 3}
+            className="flex-1 py-3 rounded-xl font-bold text-sm disabled:opacity-40 text-[var(--card)]"
+            style={{ backgroundColor: "var(--accent)" }}
+          >
+            {t.join}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full bg-[var(--card)] rounded-2xl p-4 flex flex-col gap-3 border border-[var(--card-2)]">
+      <p className="text-sm font-semibold text-center">{label}</p>
+      <div className="flex gap-2">
+        <button
+          onClick={onCreate}
+          className="flex-1 py-3 rounded-xl font-bold text-sm text-[var(--card)]"
+          style={{ backgroundColor: "var(--accent)" }}
+        >
+          {t.createRoom}
+        </button>
+        <button
+          onClick={() => setJoining(true)}
+          className="flex-1 py-3 rounded-xl bg-[var(--card-2)] text-[var(--foreground)] font-semibold text-sm"
+        >
+          {t.joinRoom}
+        </button>
+      </div>
+      <button
+        onClick={() => setOpen(false)}
+        className="text-xs text-[var(--text-muted)] text-center"
+      >
+        {t.cancel}
+      </button>
+    </div>
+  );
+}
+
 type Props = {
   initialData: SetupData;
   onStart: (data: SetupData) => void;
   onCreateRoom?: (data: SetupData) => void;
+  onJoinRoom?: (code: string) => void;
 };
 
-export default function SetupPhase({ initialData, onStart, onCreateRoom }: Props) {
+export default function SetupPhase({ initialData, onStart, onCreateRoom, onJoinRoom }: Props) {
   const { locale, t } = useLanguage();
   const wordCategories = getWordCategories(locale);
   const [players, setPlayers] = useState<Player[]>(initialData.players);
@@ -279,15 +368,13 @@ export default function SetupPhase({ initialData, onStart, onCreateRoom }: Props
         >
           {t.startGame}
         </button>
-        {onCreateRoom && (
-          <button
-            onClick={() =>
-              onCreateRoom({ players: [], wordSource, category, customWords })
-            }
-            className="w-full bg-[var(--card)] text-[var(--foreground)] text-base font-semibold py-4 rounded-2xl border border-[var(--card-2)]"
-          >
-            {t.createOnlineRoom ?? "🌐 Create Online Room"}
-          </button>
+        {onCreateRoom && onJoinRoom && (
+          <MultiplayerPicker
+            label={t.createOnlineRoom}
+            onCreate={() => onCreateRoom({ players: [], wordSource, category, customWords })}
+            onJoin={onJoinRoom}
+            t={t}
+          />
         )}
       </div>
     </div>
