@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { SetupData, LocalGameData } from "@/lib/types";
 import { startGame } from "@/lib/game";
 import SetupPhase from "./components/SetupPhase";
@@ -23,6 +24,33 @@ export default function Home() {
   const [setupData, setSetupData] = useState<SetupData>(DEFAULT_SETUP);
   const [gameData, setGameData] = useState<LocalGameData | null>(null);
   const { locale } = useLanguage();
+  const router = useRouter();
+
+  async function handleCreateRoom(data: SetupData, host?: { name?: string; emoji?: string }) {
+    const playerId = localStorage.getItem("imposter-player-id") ?? crypto.randomUUID();
+    localStorage.setItem("imposter-player-id", playerId);
+
+    const hostName = host?.name && host.name.trim().length > 0 ? host.name.trim() : "Host";
+    const hostEmoji = host?.emoji ?? "👑";
+
+    const res = await fetch("/api/rooms", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        playerName: hostName,
+        playerEmoji: hostEmoji,
+        playerId,
+        locale,
+        category: data.category !== "all" ? data.category : undefined,
+      }),
+    });
+    const { room } = await res.json();
+    router.push(`/room/${room.id}`);
+  }
+
+  function handleJoinRoom(code: string) {
+    router.push(`/room/${code.toUpperCase()}`);
+  }
 
   function handleStart(data: SetupData) {
     setSetupData(data);
@@ -58,7 +86,7 @@ export default function Home() {
   return (
     <main className="min-h-dvh flex flex-col" style={{ backgroundColor: 'var(--page-bg)', color: 'var(--foreground)' }}>
       {phase === "setup" && (
-        <SetupPhase initialData={setupData} onStart={handleStart} />
+        <SetupPhase initialData={setupData} onStart={handleStart} onCreateRoom={handleCreateRoom} onJoinRoom={handleJoinRoom} />
       )}
       {phase === "reveal" && gameData && (
         <RevealPhase

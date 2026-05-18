@@ -52,6 +52,25 @@ export type Translations = {
   theImposterWas: string;
   votes: string;
   playAgain: string;
+  // Multiplayer / room
+  createOnlineRoom: string;
+  createRoom: string;
+  roomCode: string;
+  shareCode: string;
+  waitingForHost: string;
+  join: string;
+  joinRoom: string;
+  yourName: string;
+  roomNotFound: string;
+  needMorePlayers: string;
+  youAreImposter: string;
+  yourWord: string;
+  imposterEscaped: string;
+  imReady: string;
+  waitingForOthers: string;
+  voteTitle: string;
+  theWord: string;
+  wasImposter: string;
 };
 
 const en: Translations = {
@@ -93,6 +112,24 @@ const en: Translations = {
   theImposterWas: "The imposter was",
   votes: "Votes",
   playAgain: "Play again",
+  createOnlineRoom: "🌐 Multiplayer",
+  createRoom: "Create Room",
+  roomCode: "Room Code",
+  shareCode: "Share this code with other players",
+  waitingForHost: "Waiting for host to start…",
+  join: "Join",
+  joinRoom: "Join Room",
+  yourName: "Your name",
+  roomNotFound: "Room not found",
+  needMorePlayers: "Need at least 3 players to start",
+  youAreImposter: "You are the IMPOSTER",
+  yourWord: "Your word",
+  imposterEscaped: "Imposter escaped!",
+  imReady: "I've read it — I'm ready",
+  waitingForOthers: "Waiting for others…",
+  voteTitle: "Who is the imposter?",
+  theWord: "The word was",
+  wasImposter: "was the imposter",
 };
 
 const de: Translations = {
@@ -134,6 +171,24 @@ const de: Translations = {
   theImposterWas: "Der Imposter war",
   votes: "Stimmen",
   playAgain: "Nochmal spielen",
+  createOnlineRoom: "🌐 Mehrspieler",
+  createRoom: "Raum erstellen",
+  roomCode: "Raumcode",
+  shareCode: "Teile diesen Code mit den anderen Spielern",
+  waitingForHost: "Warten auf Spielleiter…",
+  join: "Beitreten",
+  joinRoom: "Raum beitreten",
+  yourName: "Dein Name",
+  roomNotFound: "Raum nicht gefunden",
+  needMorePlayers: "Mindestens 3 Spieler benötigt",
+  youAreImposter: "Du bist der IMPOSTER",
+  yourWord: "Dein Wort",
+  imposterEscaped: "Imposter entkommen!",
+  imReady: "Gelesen — ich bin bereit",
+  waitingForOthers: "Warten auf andere…",
+  voteTitle: "Wer ist der Imposter?",
+  theWord: "Das Wort war",
+  wasImposter: "war der Imposter",
 };
 
 const it: Translations = {
@@ -175,6 +230,24 @@ const it: Translations = {
   theImposterWas: "L'impostore era",
   votes: "Voti",
   playAgain: "Gioca ancora",
+  createOnlineRoom: "🌐 Multigiocatore",
+  createRoom: "Crea stanza",
+  roomCode: "Codice stanza",
+  shareCode: "Condividi questo codice con gli altri giocatori",
+  waitingForHost: "In attesa dell'host…",
+  join: "Entra",
+  joinRoom: "Unisciti alla stanza",
+  yourName: "Il tuo nome",
+  roomNotFound: "Stanza non trovata",
+  needMorePlayers: "Servono almeno 3 giocatori",
+  youAreImposter: "Sei l'IMPOSTORE",
+  yourWord: "La tua parola",
+  imposterEscaped: "L'impostore è scappato!",
+  imReady: "Letto — sono pronto",
+  waitingForOthers: "In attesa degli altri…",
+  voteTitle: "Chi è l'impostore?",
+  theWord: "La parola era",
+  wasImposter: "era l'impostore",
 };
 
 const fr: Translations = {
@@ -216,6 +289,24 @@ const fr: Translations = {
   theImposterWas: "L'imposteur était",
   votes: "Votes",
   playAgain: "Rejouer",
+  createOnlineRoom: "🌐 Multijoueur",
+  createRoom: "Créer une salle",
+  roomCode: "Code de la salle",
+  shareCode: "Partage ce code avec les autres joueurs",
+  waitingForHost: "En attente de l'hôte…",
+  join: "Rejoindre",
+  joinRoom: "Rejoindre une salle",
+  yourName: "Ton prénom",
+  roomNotFound: "Salle introuvable",
+  needMorePlayers: "Il faut au moins 3 joueurs",
+  youAreImposter: "Tu es l'IMPOSTEUR",
+  yourWord: "Ton mot",
+  imposterEscaped: "L'imposteur s'est échappé !",
+  imReady: "Lu — je suis prêt",
+  waitingForOthers: "En attente des autres…",
+  voteTitle: "Qui est l'imposteur ?",
+  theWord: "Le mot était",
+  wasImposter: "était l'imposteur",
 };
 
 const es: Translations = {
@@ -257,6 +348,24 @@ const es: Translations = {
   theImposterWas: "El impostor era",
   votes: "Votos",
   playAgain: "Jugar de nuevo",
+  createOnlineRoom: "🌐 Multijugador",
+  createRoom: "Crear sala",
+  roomCode: "Código de sala",
+  shareCode: "Comparte este código con los demás jugadores",
+  waitingForHost: "Esperando al anfitrión…",
+  join: "Unirse",
+  joinRoom: "Unirse a una sala",
+  yourName: "Tu nombre",
+  roomNotFound: "Sala no encontrada",
+  needMorePlayers: "Se necesitan al menos 3 jugadores",
+  youAreImposter: "Eres el IMPOSTOR",
+  yourWord: "Tu palabra",
+  imposterEscaped: "¡El impostor escapó!",
+  imReady: "Leído — estoy listo",
+  waitingForOthers: "Esperando a los demás…",
+  voteTitle: "¿Quién es el impostor?",
+  theWord: "La palabra era",
+  wasImposter: "era el impostor",
 };
 
 const sv: Translations = {
@@ -298,6 +407,24 @@ const sv: Translations = {
   theImposterWas: "Bedragaren var",
   votes: "Röster",
   playAgain: "Spela igen",
+  createOnlineRoom: "🌐 Flerspelare",
+  createRoom: "Skapa rum",
+  roomCode: "Rumskod",
+  shareCode: "Dela den här koden med de andra spelarna",
+  waitingForHost: "Väntar på värden…",
+  join: "Gå med",
+  joinRoom: "Gå med i rum",
+  yourName: "Ditt namn",
+  roomNotFound: "Rummet hittades inte",
+  needMorePlayers: "Behöver minst 3 spelare",
+  youAreImposter: "Du är BEDRAGAREN",
+  yourWord: "Ditt ord",
+  imposterEscaped: "Bedragaren flydde!",
+  imReady: "Läst — jag är redo",
+  waitingForOthers: "Väntar på de andra…",
+  voteTitle: "Vem är bedragaren?",
+  theWord: "Ordet var",
+  wasImposter: "var bedragaren",
 };
 
 export const TRANSLATIONS: Record<Locale, Translations> = { en, de, it, fr, es, sv };

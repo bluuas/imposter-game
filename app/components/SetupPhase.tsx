@@ -2,10 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Player, SetupData } from "@/lib/types";
+import type { Translations } from "@/lib/i18n";
 import { getWordCategories } from "@/data/words";
 import FunModePicker from "./FunModePicker";
 import LanguagePicker from "./LanguagePicker";
 import { useLanguage } from "./LanguageProvider";
+import { useRouter } from "next/navigation";
 
 const EMOJIS = [
   "😀", "😎", "🤩", "🥳", "😈", "👻", "🤠", "🤓",
@@ -13,12 +15,101 @@ const EMOJIS = [
   "🔥", "⚡", "🎯", "🎮", "🚀", "💎", "🦄", "🎭",
 ];
 
+function MultiplayerPicker({
+  label,
+  onCreate,
+  onJoin,
+  t,
+}: {
+  label: string;
+  onCreate: () => void;
+  onJoin: (code: string) => void;
+  t: Translations;
+}) {
+  const [open, setOpen] = useState(false);
+  const [joining, setJoining] = useState(false);
+  const [code, setCode] = useState("");
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="w-full bg-[var(--card)] text-[var(--foreground)] text-base font-semibold py-4 rounded-2xl border border-[var(--card-2)]"
+      >
+        {label}
+      </button>
+    );
+  }
+
+  if (joining) {
+    return (
+      <div className="w-full bg-[var(--card)] rounded-2xl p-4 flex flex-col gap-3 border border-[var(--card-2)]">
+        <p className="text-sm font-semibold text-center">{t.joinRoom}</p>
+        <input
+          autoFocus
+          value={code}
+          onChange={(e) => setCode(e.target.value.toUpperCase().replace(/[^A-Z2-9]/g, "").slice(0, 3))}
+          onKeyDown={(e) => e.key === "Enter" && code.length === 3 && onJoin(code)}
+          placeholder="ABC"
+          className="w-full text-center text-2xl font-black tracking-widest px-4 py-3 rounded-xl bg-[var(--card-2)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] outline-none focus:ring-2 focus:ring-[var(--accent)] uppercase"
+          maxLength={3}
+        />
+        <div className="flex gap-2">
+          <button
+            onClick={() => { setJoining(false); setCode(""); }}
+            className="flex-1 py-3 rounded-xl bg-[var(--card-2)] text-[var(--text-muted)] text-sm font-medium"
+          >
+            {t.cancel}
+          </button>
+          <button
+            onClick={() => onJoin(code)}
+            disabled={code.length !== 3}
+            className="flex-1 py-3 rounded-xl font-bold text-sm disabled:opacity-40 text-[var(--card)]"
+            style={{ backgroundColor: "var(--accent)" }}
+          >
+            {t.join}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full bg-[var(--card)] rounded-2xl p-4 flex flex-col gap-3 border border-[var(--card-2)]">
+      <p className="text-sm font-semibold text-center">{label}</p>
+      <div className="flex gap-2">
+        <button
+          onClick={onCreate}
+          className="flex-1 py-3 rounded-xl font-bold text-sm text-[var(--card)]"
+          style={{ backgroundColor: "var(--accent)" }}
+        >
+          {t.createRoom}
+        </button>
+        <button
+          onClick={() => setJoining(true)}
+          className="flex-1 py-3 rounded-xl bg-[var(--card-2)] text-[var(--foreground)] font-semibold text-sm"
+        >
+          {t.joinRoom}
+        </button>
+      </div>
+      <button
+        onClick={() => setOpen(false)}
+        className="text-xs text-[var(--text-muted)] text-center"
+      >
+        {t.cancel}
+      </button>
+    </div>
+  );
+}
+
 type Props = {
   initialData: SetupData;
   onStart: (data: SetupData) => void;
+  onCreateRoom?: (data: SetupData) => void;
+  onJoinRoom?: (code: string) => void;
 };
 
-export default function SetupPhase({ initialData, onStart }: Props) {
+export default function SetupPhase({ initialData, onStart, onCreateRoom, onJoinRoom }: Props) {
   const { locale, t } = useLanguage();
   const wordCategories = getWordCategories(locale);
   const [players, setPlayers] = useState<Player[]>(initialData.players);
@@ -35,6 +126,9 @@ export default function SetupPhase({ initialData, onStart }: Props) {
   const [newName, setNewName] = useState("");
   const [newEmoji, setNewEmoji] = useState(EMOJIS[0]);
   const addFormRef = useRef<HTMLDivElement>(null);
+  const [hostModalOpen, setHostModalOpen] = useState(false);
+  const [hostName, setHostName] = useState("");
+  const [hostEmoji, setHostEmoji] = useState(EMOJIS[0]);
 
   useEffect(() => {
     if (showAddForm) {
@@ -265,8 +359,8 @@ export default function SetupPhase({ initialData, onStart }: Props) {
         )}
       </section>
 
-      {/* Start button */}
-      <div className="mt-auto pb-8">
+      {/* Start buttons */}
+      <div className="mt-auto pb-8 flex flex-col gap-3">
         <button
           onClick={() =>
             onStart({ players, wordSource, category, customWords })
@@ -277,6 +371,62 @@ export default function SetupPhase({ initialData, onStart }: Props) {
         >
           {t.startGame}
         </button>
+        {onCreateRoom && onJoinRoom && (
+          <>
+            <MultiplayerPicker
+              label={t.createOnlineRoom}
+              onCreate={() => setHostModalOpen(true)}
+              onJoin={onJoinRoom}
+              t={t}
+            />
+
+            {hostModalOpen && (
+              <div className="w-full bg-[var(--card)] rounded-2xl p-4 mt-2 border border-[var(--card-2)]">
+                <p className="text-sm font-semibold mb-2">{t.createRoom}</p>
+                <input
+                  value={hostName}
+                  onChange={(e) => setHostName(e.target.value)}
+                  placeholder={t.playerNamePlaceholder}
+                  className="w-full px-3 py-2 rounded-xl mb-3 bg-[var(--card-2)] text-[var(--foreground)]"
+                  maxLength={20}
+                />
+
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {EMOJIS.map((e) => (
+                    <button
+                      key={e}
+                      onClick={() => setHostEmoji(e)}
+                      className={`text-2xl p-2 rounded-md ${hostEmoji === e ? "ring-2 ring-[var(--accent)] scale-105" : "opacity-70"}`}
+                    >
+                      {e}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setHostModalOpen(false)}
+                    className="flex-1 py-3 rounded-xl bg-[var(--card-2)] text-[var(--text-muted)]"
+                  >
+                    {t.cancel}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setHostModalOpen(false);
+                      // Call parent with host info as second arg; parent may accept it
+                      // @ts-ignore allow optional host param
+                      onCreateRoom?.({ players: [], wordSource, category, customWords }, { name: hostName || "Host", emoji: hostEmoji });
+                    }}
+                    className="flex-1 py-3 rounded-xl font-bold text-[var(--card)]"
+                    style={{ backgroundColor: 'var(--accent)' }}
+                  >
+                    {t.createRoom}
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

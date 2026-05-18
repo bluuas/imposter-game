@@ -20,15 +20,28 @@ export type LocalGameData = {
   votes: Record<string, number>; // playerId -> vote count
 };
 
-export type GamePhase = "lobby" | "reveal" | "discussion" | "vote" | "result";
+export type GamePhase = "lobby" | "reveal" | "vote" | "result";
 
-// Phase 2: multi-device room state (future)
+// Phase 2: multi-device room state
+export type RoomPlayer = {
+  id: string;     // socket-free UUID, stored in localStorage
+  name: string;
+  emoji: string;
+  isHost: boolean;
+  ready: boolean; // has tapped "Ready" on their reveal card
+};
+
 export type Room = {
-  id: string;
-  players: Player[];
+  id: string;           // 6-char uppercase code
+  hostId: string;
+  players: RoomPlayer[];
   phase: GamePhase;
-  word: string;
-  imposterId: string;
-  votes: Record<string, string>; // voterId -> targetId
+  // Set when host starts the game
+  word?: string;
+  imposterId?: string;
+  category?: string;
+  locale?: string;
+  // votes: voterId -> targetId
+  votes: Record<string, string>;
   createdAt: number;
 };
