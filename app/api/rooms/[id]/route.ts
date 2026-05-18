@@ -8,19 +8,25 @@ type Params = { params: Promise<{ id: string }> };
 
 // GET /api/rooms/[id] — poll for current room state
 export async function GET(_req: NextRequest, { params }: Params) {
-  const { id } = await params;
-  const room = await getRoom(id.toUpperCase());
-  if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
-  return NextResponse.json({ room });
+  try {
+    const { id } = await params;
+    const room = await getRoom(id.toUpperCase());
+    if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
+    return NextResponse.json({ room });
+  } catch (err: any) {
+    console.error(`/api/rooms/${(await params).id} GET error:`, err?.stack ?? err?.message ?? err);
+    return NextResponse.json({ error: err?.message ?? "Internal server error" }, { status: 500 });
+  }
 }
 
 // PATCH /api/rooms/[id] — update room (join, start, ready, vote)
 export async function PATCH(req: NextRequest, { params }: Params) {
-  const { id } = await params;
-  const body = await req.json();
-  const { action } = body as { action: string };
+  try {
+    const { id } = await params;
+    const body = await req.json();
+    const { action } = body as { action: string };
 
-  const room = await updateRoom(id.toUpperCase(), (room) => {
+    const room = await updateRoom(id.toUpperCase(), (room) => {
     switch (action) {
       // ── Join ───────────────────────────────────────────────────────────────
       case "join": {
@@ -82,6 +88,10 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
   });
 
-  if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
-  return NextResponse.json({ room });
+    if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
+    return NextResponse.json({ room });
+  } catch (err: any) {
+    console.error(`/api/rooms/${(await params).id} PATCH error:`, err?.stack ?? err?.message ?? err);
+    return NextResponse.json({ error: err?.message ?? "Internal server error" }, { status: 500 });
+  }
 }
