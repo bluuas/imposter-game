@@ -21,10 +21,37 @@ const HOLD_DURATION = 1500;
 function getOrCreatePlayerId(): string {
   let id = localStorage.getItem("imposter-player-id");
   if (!id) {
-    id = crypto.randomUUID();
+    id = generateUUIDv4();
     localStorage.setItem("imposter-player-id", id);
   }
   return id;
+}
+
+// UUID v4 generator with fallbacks for environments without crypto.randomUUID
+function generateUUIDv4(): string {
+  // Preferred: native randomUUID if available
+  try {
+    if (typeof crypto !== "undefined" && typeof (crypto as any).randomUUID === "function") {
+      return (crypto as any).randomUUID();
+    }
+  } catch {}
+
+  // Use getRandomValues when available
+  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+    const buf = new Uint8Array(16);
+    crypto.getRandomValues(buf);
+    buf[6] = (buf[6] & 0x0f) | 0x40; // version 4
+    buf[8] = (buf[8] & 0x3f) | 0x80; // variant
+    const hex = Array.from(buf, (b) => b.toString(16).padStart(2, "0")).join("");
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+
+  // Fallback: Math.random-based (not cryptographically secure)
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 }
 
 async function patchRoom(roomId: string, body: object) {

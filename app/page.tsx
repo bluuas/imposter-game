@@ -26,12 +26,12 @@ export default function Home() {
   const { locale } = useLanguage();
   const router = useRouter();
 
-  async function handleCreateRoom(data: SetupData) {
+  async function handleCreateRoom(data: SetupData, host?: { name?: string; emoji?: string }) {
     const playerId = localStorage.getItem("imposter-player-id") ?? crypto.randomUUID();
     localStorage.setItem("imposter-player-id", playerId);
 
-    const hostName = "Host";
-    const hostEmoji = "👑";
+    const hostName = host?.name && host.name.trim().length > 0 ? host.name.trim() : "Host";
+    const hostEmoji = host?.emoji ?? "👑";
 
     const res = await fetch("/api/rooms", {
       method: "POST",

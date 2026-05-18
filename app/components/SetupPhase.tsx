@@ -126,6 +126,9 @@ export default function SetupPhase({ initialData, onStart, onCreateRoom, onJoinR
   const [newName, setNewName] = useState("");
   const [newEmoji, setNewEmoji] = useState(EMOJIS[0]);
   const addFormRef = useRef<HTMLDivElement>(null);
+  const [hostModalOpen, setHostModalOpen] = useState(false);
+  const [hostName, setHostName] = useState("");
+  const [hostEmoji, setHostEmoji] = useState(EMOJIS[0]);
 
   useEffect(() => {
     if (showAddForm) {
@@ -369,12 +372,60 @@ export default function SetupPhase({ initialData, onStart, onCreateRoom, onJoinR
           {t.startGame}
         </button>
         {onCreateRoom && onJoinRoom && (
-          <MultiplayerPicker
-            label={t.createOnlineRoom}
-            onCreate={() => onCreateRoom({ players: [], wordSource, category, customWords })}
-            onJoin={onJoinRoom}
-            t={t}
-          />
+          <>
+            <MultiplayerPicker
+              label={t.createOnlineRoom}
+              onCreate={() => setHostModalOpen(true)}
+              onJoin={onJoinRoom}
+              t={t}
+            />
+
+            {hostModalOpen && (
+              <div className="w-full bg-[var(--card)] rounded-2xl p-4 mt-2 border border-[var(--card-2)]">
+                <p className="text-sm font-semibold mb-2">{t.createRoom}</p>
+                <input
+                  value={hostName}
+                  onChange={(e) => setHostName(e.target.value)}
+                  placeholder={t.playerNamePlaceholder}
+                  className="w-full px-3 py-2 rounded-xl mb-3 bg-[var(--card-2)] text-[var(--foreground)]"
+                  maxLength={20}
+                />
+
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {EMOJIS.map((e) => (
+                    <button
+                      key={e}
+                      onClick={() => setHostEmoji(e)}
+                      className={`text-2xl p-2 rounded-md ${hostEmoji === e ? "ring-2 ring-[var(--accent)] scale-105" : "opacity-70"}`}
+                    >
+                      {e}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setHostModalOpen(false)}
+                    className="flex-1 py-3 rounded-xl bg-[var(--card-2)] text-[var(--text-muted)]"
+                  >
+                    {t.cancel}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setHostModalOpen(false);
+                      // Call parent with host info as second arg; parent may accept it
+                      // @ts-ignore allow optional host param
+                      onCreateRoom?.({ players: [], wordSource, category, customWords }, { name: hostName || "Host", emoji: hostEmoji });
+                    }}
+                    className="flex-1 py-3 rounded-xl font-bold text-[var(--card)]"
+                    style={{ backgroundColor: 'var(--accent)' }}
+                  >
+                    {t.createRoom}
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
