@@ -12,7 +12,8 @@ const EMOJIS = [
   "🔥", "⚡", "🎯", "🎮", "🚀", "💎", "🦄", "🎭",
 ];
 
-const POLL_INTERVAL = 2000;
+const LOBBY_POLL = 1000; // 1s while in lobby/setup
+const DEFAULT_POLL = 5000; // 5s afterwards
 const HOLD_DURATION = 1500;
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -392,9 +393,10 @@ export default function RoomPage() {
       setRoom(r);
       const isInRoom = r.players.some((p) => p.id === playerId);
       if (isInRoom) setJoined(true);
-      // Keep polling until result
+      // Keep polling until result. Use faster polling in lobby, slower afterwards.
       if (r.phase !== "result") {
-        pollRef.current = setTimeout(poll, POLL_INTERVAL);
+        const interval = r.phase === "lobby" ? LOBBY_POLL : DEFAULT_POLL;
+        pollRef.current = setTimeout(poll, interval);
       }
     }
 
