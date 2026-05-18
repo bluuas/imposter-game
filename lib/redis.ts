@@ -22,7 +22,6 @@ function createRedis(): Redis {
     if (!Number.isNaN(dbIndex)) opts.db = dbIndex;
   }
 
-}
   return new Redis(opts);
 }
 
