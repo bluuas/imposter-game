@@ -272,7 +272,7 @@ function VotePhaseMulti({ room, playerId, onVote }: {
 
 // ── Result (multi-device) ──────────────────────────────────────────────────
 
-function ResultPhaseMulti({ room }: { room: Room }) {
+function ResultPhaseMulti({ room, playerId, onStart }: { room: Room; playerId?: string; onStart?: () => void }) {
   const { t } = useLanguage();
   const imposter = room.players.find((p) => p.id === room.imposterId);
 
@@ -303,6 +303,19 @@ function ResultPhaseMulti({ room }: { room: Room }) {
         <p className="text-sm text-[var(--text-muted)] mb-1">{t.theWord}</p>
         <p className="text-3xl font-black text-[var(--accent)]">{room.word}</p>
       </div>
+
+      {/* Host: allow starting a new round */}
+      {playerId && room.hostId === playerId && (
+        <div className="mt-4">
+          <button
+            onClick={() => onStart?.()}
+            disabled={room.players.length < 3}
+            className="w-full py-3 rounded-2xl font-bold text-lg bg-[var(--accent)] text-white disabled:opacity-40"
+          >
+            {room.players.length >= 3 ? t.startGame : t.needMorePlayers}
+          </button>
+        </div>
+      )}
 
       <div className="w-full">
         <p className="text-sm text-[var(--text-muted)] mb-2 text-left">{t.votes}</p>
@@ -420,11 +433,10 @@ export default function RoomPage() {
       setRoom(r);
       const isInRoom = r.players.some((p) => p.id === playerId);
       if (isInRoom) setJoined(true);
-      // Keep polling until result. Use faster polling in lobby, slower afterwards.
-      if (r.phase !== "result") {
-        const interval = r.phase === "lobby" ? LOBBY_POLL : DEFAULT_POLL;
-        pollRef.current = setTimeout(poll, interval);
-      }
+      // Keep polling so guests see state changes (e.g. host starting a new game).
+      // Use faster polling in lobby, slower otherwise (including result).
+      const interval = r.phase === "lobby" ? LOBBY_POLL : DEFAULT_POLL;
+      pollRef.current = setTimeout(poll, interval);
     }
 
     poll();
@@ -488,7 +500,7 @@ export default function RoomPage() {
       ) : room.phase === "vote" ? (
         <VotePhaseMulti room={room} playerId={playerId} onVote={handleVote} />
       ) : (
-        <ResultPhaseMulti room={room} />
+        <ResultPhaseMulti room={room} playerId={playerId} onStart={handleStart} />
       )}
     </main>
   );
