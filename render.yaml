@@ -7,13 +7,5 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: REDIS_URL
-        fromService:
-          name: imposter-game-redis
-          type: redis
-          property: connectionString
 
-  - type: redis
-    name: imposter-game-redis
-    plan: free
-    maxmemoryPolicy: allkeys-lru
+  # Redis service removed — using in-memory room store instead
