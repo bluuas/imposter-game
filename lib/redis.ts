@@ -22,11 +22,36 @@ function createRedis(): Redis {
     if (!Number.isNaN(dbIndex)) opts.db = dbIndex;
   }
 
+}
   return new Redis(opts);
 }
 
-// Re-use the connection in development (HMR creates new modules each refresh)
-const redis: Redis = globalThis._redis ?? createRedis();
-if (process.env.NODE_ENV !== "production") globalThis._redis = redis;
+// Lazy-initialize the Redis client to avoid throwing at module import time
+let _instance: Redis | undefined = (globalThis as any)._redis;
+function getRedis(): Redis {
+  if (!_instance) {
+    const url = process.env.REDIS_URL;
+    if (!url) throw new Error("REDIS_URL environment variable is not set");
+    _instance = createRedis();
+    if (process.env.NODE_ENV !== "production") (globalThis as any)._redis = _instance;
+  }
+  return _instance;
+}
 
-export default redis;
+// Export a proxy that forwards calls to the real client when first used.
+const handler: ProxyHandler<any> = {
+  get(_, prop) {
+    const inst = getRedis();
+    const v = (inst as any)[prop];
+    if (typeof v === "function") return v.bind(inst);
+    return v;
+  },
+  apply(_, __, args) {
+    const inst = getRedis();
+    return (inst as any).apply(undefined, args);
+  },
+};
+
+const redisProxy = new Proxy({}, handler) as unknown as Redis;
+
+export default redisProxy;
