@@ -17,7 +17,8 @@ export type LocalGameData = {
   imposterId: string;
   revealOrder: Player[];
   currentRevealIndex: number;
-  votes: Record<string, number>; // playerId -> vote count
+  votes: Record<string, string>; // voterId -> targetId
+  currentVoterIndex: number;     // index into revealOrder for whose turn to vote
 };
 
 export type GamePhase = "lobby" | "reveal" | "vote" | "result";
