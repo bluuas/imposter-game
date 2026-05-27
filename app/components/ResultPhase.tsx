@@ -13,17 +13,19 @@ export default function ResultPhase({ players, gameData, onPlayAgain }: Props) {
   const { word, imposterId, votes } = gameData;
   const imposter = players.find((p) => p.id === imposterId)!;
 
-  const mostVotedId = Object.entries(votes).reduce<[string, number]>(
-    (best, [id, count]) => (count > best[1] ? [id, count] : best),
-    ["", -1]
-  )[0];
+  // Tally votes: voterId -> targetId, count per target
+  const tally: Record<string, number> = {};
+  for (const targetId of Object.values(votes)) {
+    tally[targetId] = (tally[targetId] ?? 0) + 1;
+  }
 
+  const mostVotedId = Object.entries(tally).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
   const imposterCaught = mostVotedId === imposterId;
-  const maxVotes = Math.max(1, ...Object.values(votes));
+  const maxVotes = Math.max(1, ...Object.values(tally));
   const { t } = useLanguage();
 
   const sortedPlayers = [...players].sort(
-    (a, b) => (votes[b.id] ?? 0) - (votes[a.id] ?? 0)
+    (a, b) => (tally[b.id] ?? 0) - (tally[a.id] ?? 0)
   );
 
   return (
@@ -80,12 +82,12 @@ export default function ResultPhase({ players, gameData, onPlayAgain }: Props) {
                 className="h-2 rounded-full transition-all"
                 style={{
                   backgroundColor: 'var(--accent)',
-                  width: `${((votes[p.id] ?? 0) / maxVotes) * 80}px`,
+                  width: `${((tally[p.id] ?? 0) / maxVotes) * 80}px`,
                   minWidth: "4px",
                 }}
               />
               <span className="text-sm w-4 text-right text-[var(--text-muted)]">
-                {votes[p.id] ?? 0}
+                {tally[p.id] ?? 0}
               </span>
             </div>
           </div>

@@ -237,34 +237,41 @@ function VotePhaseMulti({ room, playerId, onVote }: {
   onVote: (targetId: string) => void;
 }) {
   const { t } = useLanguage();
-  const hasVoted = playerId in room.votes;
+  const myVote = room.votes[playerId]; // currently selected targetId, undefined if not voted yet
   const voteCount = Object.keys(room.votes).length;
 
   return (
     <div className="flex flex-col gap-4">
       <h2 className="text-xl font-bold text-center">{t.voteTitle}</h2>
+      <p className="text-center text-sm text-[var(--text-muted)]">
+        {t.votedXofY(voteCount, room.players.length)}
+      </p>
 
-      {!hasVoted ? (
-        <div className="flex flex-col gap-3">
-          {room.players.filter((p) => p.id !== playerId).map((p) => {
-            const colors = getEmojiColor(p.emoji);
-            return (
-              <button
-                key={p.id}
-                onClick={() => onVote(p.id)}
-                className="flex items-center gap-3 px-4 py-3 rounded-2xl font-medium text-left active:scale-95 transition-transform"
-                style={{ backgroundColor: colors.bg, color: colors.text, border: `1px solid ${colors.border}` }}
-              >
-                <span className="text-2xl">{p.emoji}</span>
-                <span>{p.name}</span>
-              </button>
-            );
-          })}
-        </div>
-      ) : (
-        <p className="text-center text-[var(--text-muted)]">
-          {t.waitingForOthers}
-        </p>
+      <div className="flex flex-col gap-3">
+        {room.players.filter((p) => p.id !== playerId).map((p) => {
+          const colors = getEmojiColor(p.emoji);
+          const isSelected = myVote === p.id;
+          return (
+            <button
+              key={p.id}
+              onClick={() => onVote(p.id)}
+              className="flex items-center gap-3 px-4 py-3 rounded-2xl font-medium text-left active:scale-95 transition-transform"
+              style={{
+                backgroundColor: isSelected ? "var(--accent)" : colors.bg,
+                color: isSelected ? "var(--card)" : colors.text,
+                border: `2px solid ${isSelected ? "var(--accent)" : colors.border}`,
+              }}
+            >
+              {isSelected && <span className="text-lg">✓</span>}
+              <span className="text-2xl">{p.emoji}</span>
+              <span>{p.name}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {myVote && (
+        <p className="text-center text-xs text-[var(--text-muted)]">{t.waitingForOthers}</p>
       )}
     </div>
   );

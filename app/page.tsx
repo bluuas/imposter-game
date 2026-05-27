@@ -83,17 +83,15 @@ export default function Home() {
   }
 
   function handleVote(targetId: string) {
-    setGameData((prev) =>
-      prev
-        ? {
-            ...prev,
-            votes: {
-              ...prev.votes,
-              [targetId]: (prev.votes[targetId] ?? 0) + 1,
-            },
-          }
-        : prev
-    );
+    setGameData((prev) => {
+      if (!prev) return prev;
+      const voter = prev.revealOrder[prev.currentVoterIndex];
+      return {
+        ...prev,
+        votes: { ...prev.votes, [voter.id]: targetId },
+        currentVoterIndex: prev.currentVoterIndex + 1,
+      };
+    });
   }
 
   function handleReset() {
@@ -116,6 +114,7 @@ export default function Home() {
       {phase === "vote" && gameData && (
         <VotePhase
           players={setupData.players}
+          currentVoter={gameData.revealOrder[gameData.currentVoterIndex] ?? null}
           votes={gameData.votes}
           onVote={handleVote}
           onReveal={() => setPhase("result")}

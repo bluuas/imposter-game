@@ -19,7 +19,5 @@ export function startGame(setup: SetupData, locale: Locale = "en"): LocalGameDat
 
   const revealOrder = [...setup.players].sort(() => Math.random() - 0.5);
 
-  const votes = Object.fromEntries(setup.players.map((p: Player) => [p.id, 0]));
-
-  return { word, imposterId, revealOrder, currentRevealIndex: 0, votes };
+  return { word, imposterId, revealOrder, currentRevealIndex: 0, votes: {}, currentVoterIndex: 0 };
 }
