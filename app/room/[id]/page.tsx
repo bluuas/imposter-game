@@ -12,6 +12,13 @@ const EMOJIS = [
   "🔥", "⚡", "🎯", "🎮", "🚀", "💎", "🦄", "🎭",
 ];
 
+const WORD_MASK_EMOJIS = [
+  "🍕", "🦕", "🌮", "🍔", "🌈", "🎸", "🏄", "🧁",
+  "🎯", "🌵", "🐙", "🦈", "🎭", "🌺", "🎪", "🍦",
+  "🏆", "🎲", "🦋", "🌊", "🎨", "🧩", "🦜", "🍰",
+  "🚂", "🌙", "⭐", "🔮", "🎀", "🍭", "🌶️", "🎃",
+];
+
 const LOBBY_POLL = 1000; // 1s while in lobby/setup
 const DEFAULT_POLL = 5000; // 5s afterwards
 const HOLD_DURATION = 1500;
@@ -83,14 +90,37 @@ function PlayerChip({ player }: { player: RoomPlayer }) {
 
 // ── Lobby ──────────────────────────────────────────────────────────────────
 
-function LobbyPhase({ room, playerId, onStart }: {
+function LobbyPhase({ room, playerId, onStart, onAddWord, onRemoveWord }: {
   room: Room;
   playerId: string;
   onStart: () => void;
+  onAddWord: (word: string, maskEmoji: string) => Promise<void>;
+  onRemoveWord: (maskEmoji: string) => Promise<void>;
 }) {
   const { t } = useLanguage();
   const isHost = room.hostId === playerId;
   const canStart = room.players.length >= 3;
+  const [wordInput, setWordInput] = useState("");
+  const [adding, setAdding] = useState(false);
+
+  const myWords = (room.customWords ?? []).filter((e) => e.addedBy === playerId);
+
+  function pickMaskEmoji(): string {
+    const used = new Set((room.customWords ?? []).map((e) => e.maskEmoji));
+    const available = WORD_MASK_EMOJIS.filter((e) => !used.has(e));
+    const pool = available.length > 0 ? available : WORD_MASK_EMOJIS;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  async function handleAdd() {
+    const word = wordInput.trim();
+    if (!word || adding) return;
+    setAdding(true);
+    const maskEmoji = pickMaskEmoji();
+    await onAddWord(word, maskEmoji);
+    setWordInput("");
+    setAdding(false);
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -107,6 +137,71 @@ function LobbyPhase({ room, playerId, onStart }: {
         <div className="flex flex-wrap gap-2">
           {room.players.map((p) => <PlayerChip key={p.id} player={p} />)}
         </div>
+      </div>
+
+      {/* ── Secret words ──────────────────────────────────────────────────── */}
+      <div>
+        <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-3">
+          {t.secretWordsSection}
+        </h2>
+
+        <div className="flex gap-2 mb-3">
+          <input
+            type="text"
+            value={wordInput}
+            onChange={(e) => setWordInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+            placeholder={t.addSecretWord}
+            maxLength={30}
+            className="flex-1 rounded-xl px-4 py-3 text-base bg-[var(--card)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] outline-none focus:ring-2 focus:ring-[var(--accent)]"
+          />
+          <button
+            onClick={handleAdd}
+            disabled={!wordInput.trim() || adding}
+            className="disabled:opacity-40 text-white px-5 py-3 rounded-xl font-medium"
+            style={{ backgroundColor: "var(--accent)" }}
+          >
+            {t.add}
+          </button>
+        </div>
+
+        {/* Hint + word pills */}
+        {(room.customWords ?? []).length > 0 && (
+          <>
+            <p className="text-xs text-[var(--text-muted)] mb-2">{t.wordHiddenHint}</p>
+            <div className="flex flex-wrap gap-2">
+              {/* My words — with remove button */}
+              {myWords.map((entry) => (
+                <span
+                  key={entry.maskEmoji}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm bg-[var(--card)] ring-1 ring-[var(--accent)]"
+                >
+                  <span className="text-xl">{entry.maskEmoji}</span>
+                  <button
+                    onClick={() => onRemoveWord(entry.maskEmoji)}
+                    className="text-[var(--text-muted)] active:text-red-400 leading-none"
+                  >
+                    ✕
+                  </button>
+                </span>
+              ))}
+              {/* Other players' words — no label, no remove */}
+              {(room.customWords ?? [])
+                .filter((e) => e.addedBy !== playerId)
+                .map((entry) => (
+                  <span
+                    key={entry.maskEmoji + entry.addedBy}
+                    className="flex items-center px-3 py-1.5 rounded-full text-sm bg-[var(--card)]"
+                  >
+                    <span className="text-xl">{entry.maskEmoji}</span>
+                  </span>
+                ))}
+            </div>
+            <p className="text-xs text-[var(--text-muted)] mt-2">
+              {t.secretWordsAdded((room.customWords ?? []).length)}
+            </p>
+          </>
+        )}
       </div>
 
       {isHost && (
@@ -456,6 +551,18 @@ export default function RoomPage() {
     setRoom(updated);
   }
 
+  async function handleAddWord(word: string, maskEmoji: string) {
+    if (!room) return;
+    const updated = await patchRoom(roomId, { action: "addWord", playerId, word, maskEmoji });
+    setRoom(updated);
+  }
+
+  async function handleRemoveWord(maskEmoji: string) {
+    if (!room) return;
+    const updated = await patchRoom(roomId, { action: "removeWord", playerId, maskEmoji });
+    setRoom(updated);
+  }
+
   async function handleReady() {
     if (!room) return;
     const updated = await patchRoom(roomId, { action: "ready", playerId });
@@ -501,7 +608,7 @@ export default function RoomPage() {
           onJoined={(r) => { setRoom(r); setJoined(true); }}
         />
       ) : room.phase === "lobby" ? (
-        <LobbyPhase room={room} playerId={playerId} onStart={handleStart} />
+        <LobbyPhase room={room} playerId={playerId} onStart={handleStart} onAddWord={handleAddWord} onRemoveWord={handleRemoveWord} />
       ) : room.phase === "reveal" ? (
         <RevealPhaseMulti room={room} playerId={playerId} onReady={handleReady} />
       ) : room.phase === "vote" ? (

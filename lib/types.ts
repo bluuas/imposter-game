@@ -50,5 +50,7 @@ export type Room = {
   locale?: string;
   // votes: voterId -> targetId
   votes: Record<string, string>;
+  // Custom words added in the lobby (no word text — kept server-side privately)
+  customWords: Array<{ maskEmoji: string; addedBy: string }>;
   createdAt: number;
 };

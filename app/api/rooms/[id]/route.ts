@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getRoom, updateRoom } from "@/lib/roomStore";
+import { getRoom, updateRoom, addWordSecret, removeWordSecret, getWordSecrets, clearWordSecrets } from "@/lib/roomStore";
 import { getRandomWord } from "@/data/words";
 import type { Locale } from "@/lib/i18n";
 import type { RoomPlayer } from "@/lib/types";
@@ -51,13 +51,65 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         if (room.players.length < 3) return room;
 
         const locale = (room.locale ?? "en") as Locale;
-        room.word = getRandomWord(room.category, locale);
-        const imposterIndex = Math.floor(Math.random() * room.players.length);
-        room.imposterId = room.players[imposterIndex].id;
-        // Reset per-round transient state so a new round starts cleanly
+        const secrets = getWordSecrets(room.id);
+
+        let word: string;
+        let wordAddedBy: string | undefined;
+        if (secrets.length > 0) {
+          const entry = secrets[Math.floor(Math.random() * secrets.length)];
+          word = entry.word;
+          wordAddedBy = entry.addedBy;
+        } else {
+          word = getRandomWord(room.category, locale);
+        }
+
+        room.word = word;
+
+        // Exclude the word's author from being imposter
+        const imposterPool = wordAddedBy
+          ? room.players.filter((p) => p.id !== wordAddedBy)
+          : room.players;
+        const candidates = imposterPool.length > 0 ? imposterPool : room.players;
+        room.imposterId = candidates[Math.floor(Math.random() * candidates.length)].id;
+
+        // Reset per-round transient state
         room.phase = "reveal";
         room.votes = {};
+        room.customWords = [];
         room.players = room.players.map((p) => ({ ...p, ready: false }));
+
+        // Clear secrets so next round starts fresh
+        clearWordSecrets(room.id);
+        return room;
+      }
+
+      // ── Add custom word (lobby only) ────────────────────────────────────
+      case "addWord": {
+        const { playerId, word, maskEmoji } = body as {
+          playerId: string;
+          word: string;
+          maskEmoji: string;
+        };
+        if (room.phase !== "lobby") return room;
+        if (!word?.trim() || !maskEmoji) return room;
+        // Prevent duplicate mask emojis from the same player
+        const alreadyUsed = room.customWords.some(
+          (e) => e.addedBy === playerId && e.maskEmoji === maskEmoji
+        );
+        if (alreadyUsed) return room;
+        addWordSecret(room.id, { word: word.trim(), maskEmoji, addedBy: playerId });
+        room.customWords = [...(room.customWords ?? []), { maskEmoji, addedBy: playerId }];
+        return room;
+      }
+
+      // ── Remove custom word (lobby only, own words only) ─────────────────
+      case "removeWord": {
+        const { playerId, maskEmoji } = body as { playerId: string; maskEmoji: string };
+        if (room.phase !== "lobby") return room;
+        room.customWords = (room.customWords ?? []).filter(
+          (e) => !(e.addedBy === playerId && e.maskEmoji === maskEmoji)
+        );
+        removeWordSecret(room.id, playerId, maskEmoji);
         return room;
       }
 

@@ -69,6 +69,9 @@ export type Translations = {
   yourName: string;
   roomNotFound: string;
   needMorePlayers: string;
+  secretWordsSection: string;
+  addSecretWord: string;
+  secretWordsAdded: (n: number) => string;
   youAreImposter: string;
   yourWord: string;
   imposterEscaped: string;
@@ -134,6 +137,9 @@ const en: Translations = {
   yourName: "Your name",
   roomNotFound: "Room not found",
   needMorePlayers: "Need at least 3 players to start",
+  secretWordsSection: "Secret words",
+  addSecretWord: "Add a secret word...",
+  secretWordsAdded: (n) => `${n} secret word${n !== 1 ? "s" : ""} added`,
   youAreImposter: "You are the IMPOSTER",
   yourWord: "Your word",
   imposterEscaped: "Imposter escaped!",
@@ -199,6 +205,9 @@ const de: Translations = {
   yourName: "Dein Name",
   roomNotFound: "Raum nicht gefunden",
   needMorePlayers: "Mindestens 3 Spieler benötigt",
+  secretWordsSection: "Geheimwörter",
+  addSecretWord: "Geheimwort hinzufügen...",
+  secretWordsAdded: (n) => `${n} Geheimwort${n !== 1 ? "e" : ""} hinzugefügt`,
   youAreImposter: "Du bist der IMPOSTER",
   yourWord: "Dein Wort",
   imposterEscaped: "Imposter entkommen!",
@@ -264,6 +273,9 @@ const it: Translations = {
   yourName: "Il tuo nome",
   roomNotFound: "Stanza non trovata",
   needMorePlayers: "Servono almeno 3 giocatori",
+  secretWordsSection: "Parole segrete",
+  addSecretWord: "Aggiungi una parola segreta...",
+  secretWordsAdded: (n) => `${n} parola${n !== 1 ? " segrete" : " segreta"} aggiunta${n !== 1 ? "e" : ""}`,
   youAreImposter: "Sei l'IMPOSTORE",
   yourWord: "La tua parola",
   imposterEscaped: "L'impostore è scappato!",
@@ -329,6 +341,9 @@ const fr: Translations = {
   yourName: "Ton prénom",
   roomNotFound: "Salle introuvable",
   needMorePlayers: "Il faut au moins 3 joueurs",
+  secretWordsSection: "Mots secrets",
+  addSecretWord: "Ajouter un mot secret...",
+  secretWordsAdded: (n) => `${n} mot${n !== 1 ? "s" : ""} secret${n !== 1 ? "s" : ""} ajouté${n !== 1 ? "s" : ""}`,
   youAreImposter: "Tu es l'IMPOSTEUR",
   yourWord: "Ton mot",
   imposterEscaped: "L'imposteur s'est échappé !",
@@ -394,6 +409,9 @@ const es: Translations = {
   yourName: "Tu nombre",
   roomNotFound: "Sala no encontrada",
   needMorePlayers: "Se necesitan al menos 3 jugadores",
+  secretWordsSection: "Palabras secretas",
+  addSecretWord: "Añadir una palabra secreta...",
+  secretWordsAdded: (n) => `${n} palabra${n !== 1 ? "s" : ""} secreta${n !== 1 ? "s" : ""} añadida${n !== 1 ? "s" : ""}`,
   youAreImposter: "Eres el IMPOSTOR",
   yourWord: "Tu palabra",
   imposterEscaped: "¡El impostor escapó!",
@@ -459,6 +477,9 @@ const sv: Translations = {
   yourName: "Ditt namn",
   roomNotFound: "Rummet hittades inte",
   needMorePlayers: "Behöver minst 3 spelare",
+  secretWordsSection: "Hemliga ord",
+  addSecretWord: "Lägg till ett hemligt ord...",
+  secretWordsAdded: (n) => `${n} hemligt${n !== 1 ? "a" : ""} ord tillagt${n !== 1 ? "a" : ""}`,
   youAreImposter: "Du är BEDRAGAREN",
   yourWord: "Ditt ord",
   imposterEscaped: "Bedragaren flydde!",
