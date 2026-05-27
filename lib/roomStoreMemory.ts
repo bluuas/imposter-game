@@ -9,6 +9,33 @@ type Entry = {
 
 const store = new Map<string, Entry>();
 
+// ── Private word-secrets sidecar ──────────────────────────────────────────
+// Word texts are NEVER included in the Room object that gets sent to clients.
+// They live here only, server-side, until the game starts.
+type WordSecret = { word: string; maskEmoji: string; addedBy: string };
+const secretStore = new Map<string, WordSecret[]>();
+
+export function addWordSecret(roomId: string, entry: WordSecret): void {
+  const list = secretStore.get(roomId) ?? [];
+  list.push(entry);
+  secretStore.set(roomId, list);
+}
+
+export function removeWordSecret(roomId: string, addedBy: string, maskEmoji: string): void {
+  const list = secretStore.get(roomId) ?? [];
+  secretStore.set(roomId, list.filter(
+    (e) => !(e.addedBy === addedBy && e.maskEmoji === maskEmoji)
+  ));
+}
+
+export function getWordSecrets(roomId: string): WordSecret[] {
+  return secretStore.get(roomId) ?? [];
+}
+
+export function clearWordSecrets(roomId: string): void {
+  secretStore.delete(roomId);
+}
+
 function roomKey(id: string) {
   return id;
 }
@@ -45,6 +72,7 @@ export async function createRoom(hostPlayer: RoomPlayer, locale: string): Promis
     players: [hostPlayer],
     phase: "lobby",
     votes: {},
+    customWords: [],
     locale,
     createdAt: Date.now(),
   };
