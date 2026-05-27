@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Player, SetupData } from "@/lib/types";
+import { Player, SetupData, CustomWordEntry } from "@/lib/types";
 import type { Translations } from "@/lib/i18n";
 import { getWordCategories } from "@/data/words";
 import FunModePicker from "./FunModePicker";
@@ -13,6 +13,13 @@ const EMOJIS = [
   "😀", "😎", "🤩", "🥳", "😈", "👻", "🤠", "🤓",
   "🐱", "🐸", "🦊", "🐼", "🦁", "🐯", "🦋", "🌟",
   "🔥", "⚡", "🎯", "🎮", "🚀", "💎", "🦄", "🎭",
+];
+
+const WORD_MASK_EMOJIS = [
+  "🍕", "🦕", "🌮", "🍔", "🌈", "🎸", "🏄", "🧁",
+  "🎯", "🌵", "🐙", "🦈", "🎭", "🌺", "🎪", "🍦",
+  "🏆", "🎲", "🦋", "🌊", "🎨", "🧩", "🦜", "🍰",
+  "🚂", "🌙", "⭐", "🔮", "🎀", "🍭", "🌶️", "🎃",
 ];
 
 function MultiplayerPicker({
@@ -117,10 +124,11 @@ export default function SetupPhase({ initialData, onStart, onCreateRoom, onJoinR
     initialData.wordSource
   );
   const [category, setCategory] = useState(initialData.category);
-  const [customWords, setCustomWords] = useState<string[]>(
+  const [customWords, setCustomWords] = useState<CustomWordEntry[]>(
     initialData.customWords
   );
   const [customWordInput, setCustomWordInput] = useState("");
+  const [addingAs, setAddingAs] = useState<string>("");
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [newName, setNewName] = useState("");
@@ -154,13 +162,23 @@ export default function SetupPhase({ initialData, onStart, onCreateRoom, onJoinR
 
   function addCustomWord() {
     const word = customWordInput.trim();
-    if (!word || customWords.includes(word)) return;
-    setCustomWords((prev) => [...prev, word]);
+    if (!word || customWords.some((e) => e.word === word)) return;
+    // Pick a mask emoji not already in use
+    const used = new Set(customWords.map((e) => e.maskEmoji));
+    const available = WORD_MASK_EMOJIS.filter((e) => !used.has(e));
+    const pool = available.length > 0 ? available : WORD_MASK_EMOJIS;
+    const maskEmoji = pool[Math.floor(Math.random() * pool.length)];
+    const entry: CustomWordEntry = {
+      word,
+      maskEmoji,
+      addedBy: addingAs || undefined,
+    };
+    setCustomWords((prev) => [...prev, entry]);
     setCustomWordInput("");
   }
 
   function removeCustomWord(word: string) {
-    setCustomWords((prev) => prev.filter((w) => w !== word));
+    setCustomWords((prev) => prev.filter((e) => e.word !== word));
   }
 
   const canStart =
@@ -316,7 +334,34 @@ export default function SetupPhase({ initialData, onStart, onCreateRoom, onJoinR
         )}
 
         {wordSource === "custom" && (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
+            {/* Who is adding? — only shown when players exist */}
+            {players.length > 0 && (
+              <div>
+                <p className="text-xs text-[var(--text-muted)] mb-2">{t.whoIsAdding}</p>
+                <div className="flex flex-wrap gap-2">
+                  {players.map((p) => {
+                    const isActive = addingAs === p.id || (!addingAs && p.id === players[0].id);
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => setAddingAs(p.id)}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all"
+                        style={{
+                          backgroundColor: isActive ? "var(--accent)" : "var(--card)",
+                          color: isActive ? "var(--card)" : "var(--foreground)",
+                        }}
+                      >
+                        <span>{p.emoji}</span>
+                        <span>{p.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Word input */}
             <div className="flex gap-2">
               <input
                 type="text"
@@ -331,30 +376,38 @@ export default function SetupPhase({ initialData, onStart, onCreateRoom, onJoinR
                 onClick={addCustomWord}
                 disabled={!customWordInput.trim()}
                 className="disabled:opacity-40 text-[var(--card)] px-5 py-3 rounded-xl font-medium"
-                style={{ backgroundColor: 'var(--accent)' }}
+                style={{ backgroundColor: "var(--accent)" }}
               >
                 {t.add}
               </button>
             </div>
-            <div className="flex flex-wrap gap-2 mt-1">
-              {customWords.map((w) => (
-                <span
-                  key={w}
-                  className="text-sm px-3 py-1 rounded-full flex items-center gap-2 bg-[var(--card)]"
-                >
-                  {w}
-                  <button
-                    onClick={() => removeCustomWord(w)}
-                    className="text-[var(--text-muted)] active:text-red-400"
-                  >
-                    ✕
-                  </button>
-                </span>
-              ))}
-              {customWords.length === 0 && (
-                <p className="text-[var(--text-muted)] text-sm">{t.addAtLeast1Word}</p>
-              )}
-            </div>
+
+            {/* Added words — shown as masked emojis */}
+            {customWords.length > 0 && (
+              <>
+                <p className="text-xs text-[var(--text-muted)]">{t.wordHiddenHint}</p>
+                <div className="flex flex-wrap gap-2">
+                  {customWords.map((entry) => (
+                    <span
+                      key={entry.word}
+                      className="text-sm px-3 py-1 rounded-full flex items-center gap-2 bg-[var(--card)]"
+                      title={entry.word}
+                    >
+                      <span className="text-xl">{entry.maskEmoji}</span>
+                      <button
+                        onClick={() => removeCustomWord(entry.word)}
+                        className="text-[var(--text-muted)] active:text-red-400"
+                      >
+                        ✕
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
+            {customWords.length === 0 && (
+              <p className="text-[var(--text-muted)] text-sm">{t.addAtLeast1Word}</p>
+            )}
           </div>
         )}
       </section>
