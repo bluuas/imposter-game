@@ -26,6 +26,8 @@ export type Translations = {
   allCategories: string;
   addAWord: string;
   addAtLeast1Word: string;
+  whoIsAdding: string;
+  wordHiddenHint: string;
   startGame: string;
   // Reveal
   makePrivate: string;
@@ -93,6 +95,8 @@ const en: Translations = {
   allCategories: "All categories",
   addAWord: "Add a word...",
   addAtLeast1Word: "Add at least 1 word",
+  whoIsAdding: "Who's adding this word?",
+  wordHiddenHint: "Word hidden — others see an emoji",
   startGame: "Start Game",
   makePrivate: "Make sure no one else can see your screen",
   holdToReveal: "Hold to reveal",
@@ -156,6 +160,8 @@ const de: Translations = {
   allCategories: "Alle Kategorien",
   addAWord: "Wort eingeben...",
   addAtLeast1Word: "Mindestens 1 Wort hinzufügen",
+  whoIsAdding: "Wer fügt dieses Wort hinzu?",
+  wordHiddenHint: "Wort versteckt — andere sehen ein Emoji",
   startGame: "Spiel starten",
   makePrivate: "Stell sicher, dass niemand deinen Bildschirm sieht",
   holdToReveal: "Halten zum Aufdecken",
@@ -219,6 +225,8 @@ const it: Translations = {
   allCategories: "Tutte le categorie",
   addAWord: "Aggiungi una parola...",
   addAtLeast1Word: "Aggiungi almeno 1 parola",
+  whoIsAdding: "Chi aggiunge questa parola?",
+  wordHiddenHint: "Parola nascosta — gli altri vedono un'emoji",
   startGame: "Inizia partita",
   makePrivate: "Assicurati che nessuno veda il tuo schermo",
   holdToReveal: "Tieni premuto per rivelare",
@@ -282,6 +290,8 @@ const fr: Translations = {
   allCategories: "Toutes les catégories",
   addAWord: "Ajouter un mot...",
   addAtLeast1Word: "Ajoute au moins 1 mot",
+  whoIsAdding: "Qui ajoute ce mot ?",
+  wordHiddenHint: "Mot caché — les autres voient un emoji",
   startGame: "Lancer la partie",
   makePrivate: "Assure-toi que personne ne voit ton écran",
   holdToReveal: "Maintenir pour révéler",
@@ -345,6 +355,8 @@ const es: Translations = {
   allCategories: "Todas las categorías",
   addAWord: "Añadir una palabra...",
   addAtLeast1Word: "Añade al menos 1 palabra",
+  whoIsAdding: "¿Quién añade esta palabra?",
+  wordHiddenHint: "Palabra oculta — los demás ven un emoji",
   startGame: "Iniciar partida",
   makePrivate: "Asegúrate de que nadie vea tu pantalla",
   holdToReveal: "Mantén para revelar",
@@ -408,6 +420,8 @@ const sv: Translations = {
   allCategories: "Alla kategorier",
   addAWord: "Lägg till ett ord...",
   addAtLeast1Word: "Lägg till minst 1 ord",
+  whoIsAdding: "Vem lägger till det här ordet?",
+  wordHiddenHint: "Ord dolt — andra ser en emoji",
   startGame: "Starta spelet",
   makePrivate: "Se till att ingen annan ser din skärm",
   holdToReveal: "Håll inne för att avslöja",

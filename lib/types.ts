@@ -4,11 +4,17 @@ export type Player = {
   emoji: string;
 };
 
+export type CustomWordEntry = {
+  word: string;
+  maskEmoji: string; // random emoji shown publicly instead of the word
+  addedBy?: string;  // player id who added this word (excluded from being imposter)
+};
+
 export type SetupData = {
   players: Player[];
   wordSource: "category" | "custom";
   category: string;
-  customWords: string[];
+  customWords: CustomWordEntry[];
 };
 
 // Phase 1: single-device local game state
