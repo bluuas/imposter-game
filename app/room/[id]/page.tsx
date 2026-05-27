@@ -117,9 +117,14 @@ function LobbyPhase({ room, playerId, onStart, onAddWord, onRemoveWord }: {
     if (!word || adding) return;
     setAdding(true);
     const maskEmoji = pickMaskEmoji();
-    await onAddWord(word, maskEmoji);
-    setWordInput("");
-    setAdding(false);
+    try {
+      await onAddWord(word, maskEmoji);
+      setWordInput("");
+    } catch {
+      // word won't be added; button re-enables so user can retry
+    } finally {
+      setAdding(false);
+    }
   }
 
   return (
@@ -158,8 +163,11 @@ function LobbyPhase({ room, playerId, onStart, onAddWord, onRemoveWord }: {
           <button
             onClick={handleAdd}
             disabled={!wordInput.trim() || adding}
-            className="disabled:opacity-40 text-white px-5 py-3 rounded-xl font-medium"
-            style={{ backgroundColor: "var(--accent)" }}
+            className={`px-5 py-3 rounded-xl font-medium transition-colors ${
+              !wordInput.trim() || adding
+                ? "bg-[var(--card-2)] text-[var(--text-muted)] cursor-not-allowed"
+                : "bg-[var(--accent)] text-white"
+            }`}
           >
             {t.add}
           </button>
@@ -510,7 +518,7 @@ function JoinForm({ roomId, playerId, onJoined }: {
 export default function RoomPage() {
   const params = useParams();
   const router = useRouter();
-  const roomId = (params.id as string).toUpperCase();
+  const roomId = ((params?.id ?? "") as string).toUpperCase();
 
   const [room, setRoom] = useState<Room | null>(null);
   const [notFound, setNotFound] = useState(false);
@@ -528,17 +536,23 @@ export default function RoomPage() {
     if (!playerId) return;
 
     async function poll() {
-      const res = await fetch(`/api/rooms/${roomId}`);
-      if (res.status === 404) { setNotFound(true); return; }
-      const data = await res.json();
-      const r: Room = data.room;
-      setRoom(r);
-      const isInRoom = r.players.some((p) => p.id === playerId);
-      if (isInRoom) setJoined(true);
-      // Keep polling so guests see state changes (e.g. host starting a new game).
-      // Use faster polling in lobby, slower otherwise (including result).
-      const interval = r.phase === "lobby" ? LOBBY_POLL : DEFAULT_POLL;
-      pollRef.current = setTimeout(poll, interval);
+      try {
+        const res = await fetch(`/api/rooms/${roomId}`);
+        if (res.status === 404) { setNotFound(true); return; }
+        if (!res.ok) throw new Error("Poll failed");
+        const data = await res.json();
+        const r: Room = data.room;
+        setRoom(r);
+        const isInRoom = r.players.some((p) => p.id === playerId);
+        if (isInRoom) setJoined(true);
+        // Keep polling so guests see state changes (e.g. host starting a new game).
+        // Use faster polling in lobby, slower otherwise (including result).
+        const interval = r.phase === "lobby" ? LOBBY_POLL : DEFAULT_POLL;
+        pollRef.current = setTimeout(poll, interval);
+      } catch {
+        // On transient errors, retry after DEFAULT_POLL to keep the loop alive
+        pollRef.current = setTimeout(poll, DEFAULT_POLL);
+      }
     }
 
     poll();
@@ -547,8 +561,12 @@ export default function RoomPage() {
 
   async function handleStart() {
     if (!room) return;
-    const updated = await patchRoom(roomId, { action: "start", playerId });
-    setRoom(updated);
+    try {
+      const updated = await patchRoom(roomId, { action: "start", playerId });
+      setRoom(updated);
+    } catch (err) {
+      console.error("handleStart failed:", err);
+    }
   }
 
   async function handleAddWord(word: string, maskEmoji: string) {
@@ -559,20 +577,32 @@ export default function RoomPage() {
 
   async function handleRemoveWord(maskEmoji: string) {
     if (!room) return;
-    const updated = await patchRoom(roomId, { action: "removeWord", playerId, maskEmoji });
-    setRoom(updated);
+    try {
+      const updated = await patchRoom(roomId, { action: "removeWord", playerId, maskEmoji });
+      setRoom(updated);
+    } catch (err) {
+      console.error("handleRemoveWord failed:", err);
+    }
   }
 
   async function handleReady() {
     if (!room) return;
-    const updated = await patchRoom(roomId, { action: "ready", playerId });
-    setRoom(updated);
+    try {
+      const updated = await patchRoom(roomId, { action: "ready", playerId });
+      setRoom(updated);
+    } catch (err) {
+      console.error("handleReady failed:", err);
+    }
   }
 
   async function handleVote(targetId: string) {
     if (!room) return;
-    const updated = await patchRoom(roomId, { action: "vote", voterId: playerId, targetId });
-    setRoom(updated);
+    try {
+      const updated = await patchRoom(roomId, { action: "vote", voterId: playerId, targetId });
+      setRoom(updated);
+    } catch (err) {
+      console.error("handleVote failed:", err);
+    }
   }
 
   if (notFound) {
